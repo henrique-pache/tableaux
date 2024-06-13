@@ -47,7 +47,7 @@ formatTableaux :: Tableaux -> String
 formatTableaux (Leaf b) = if b then "Closed" else "Open"
 formatTableaux (Node exprs children) =
     let exprStr = intercalate ";" (map showExpr exprs)
-        childrenStr = intercalate "@" (map formatSubtree children)
+        childrenStr = intercalate "/" (map formatSubtree children)
     in exprStr ++ "/" ++ childrenStr
   where
     showExpr :: Expr -> String
