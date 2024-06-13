@@ -1,62 +1,72 @@
-import Data.List (nub)
-
--- Definição das Fórmulas Lógicas
-data Formula = Var String
+-- Definindo a estrutura de dados para representar fórmulas lógicas
+data Formula = Atom Bool
              | Not Formula
              | And Formula Formula
              | Or Formula Formula
-             | Imply Formula Formula
-             deriving (Eq)
+             | Imply Formula Formula   -- Implicação
+             | BiImply Formula Formula -- Bi-implicação
+             deriving (Show)
 
-instance Show Formula where
-    show (Var x) = x
-    show (Not f) = "~" ++ show f
-    show (And f1 f2) = "(" ++ show f1 ++ " ∧ " ++ show f2 ++ ")"
-    show (Or f1 f2) = "(" ++ show f1 ++ " ∨ " ++ show f2 ++ ")"
-    show (Imply f1 f2) = "(" ++ show f1 ++ " → " ++ show f2 ++ ")"
+-- Função para avaliar uma fórmula lógica
+evaluate :: Formula -> Bool
+evaluate (Atom b) = b
+evaluate (Not formula) = not (evaluate formula)
+evaluate (And left right) = evaluate left && evaluate right
+evaluate (Or left right) = evaluate left || evaluate right
+evaluate (Imply left right) = not (evaluate left) || evaluate right
+evaluate (BiImply left right) = (evaluate left == evaluate right)
 
--- Regras de Expansão de Tableaux
-expand :: Formula -> [Formula] -> [[Formula]]
-expand (Not (Not p)) f = [p : f]
-expand (And p q) f = [[p, q] ++ f]
-expand (Or p q) f = [[p] ++ f, [q] ++ f]
-expand (Imply p q) f = [[Not p] ++ f, [q] ++ f]
-expand (Not (And p q)) f = [[Not p] ++ f, [Not q] ++ f]
-expand (Not (Or p q)) f = [[Not p, Not q] ++ f]
-expand (Not (Imply p q)) f = [[p, Not q] ++ f]
-expand _ f = [f]
+-- Função auxiliar para avaliar átomos (simulação de tabela verdade)
+evalAtom :: String -> Bool
+evalAtom "True" = True
+evalAtom "False" = False
+evalAtom _   = error "Atom deve ser 'True' ou 'False'"
 
--- Método de Tableaux
-tableaux :: [Formula] -> [[Formula]]
-tableaux [] = [[]]
-tableaux (f:fs) =
-    case f of
-        Var _      -> map (f:) (tableaux fs)
-        Not (Var _) -> map (f:) (tableaux fs)
-        _          -> concatMap (\b -> tableaux (b ++ fs)) (expand f [])
+-- Função para construir uma árvore de tableaux (opcional, apenas para demonstração)
+buildTree :: Formula -> String
+buildTree (Atom True) = "True"
+buildTree (Atom False) = "False"
+buildTree (Not formula) = "¬" ++ buildTree formula
+buildTree (And left right) = "(" ++ buildTree left ++ " ∧ " ++ buildTree right ++ ")"
+buildTree (Or left right) = "(" ++ buildTree left ++ " ∨ " ++ buildTree right ++ ")"
+buildTree (Imply left right) = "(" ++ buildTree left ++ " → " ++ buildTree right ++ ")"
+buildTree (BiImply left right) = "(" ++ buildTree left ++ " ↔ " ++ buildTree right ++ ")"
 
--- Verificação de Contradições
-isContradiction :: [Formula] -> Bool
-isContradiction fs = any (\v -> (Not v) `elem` fs) fs
-
--- Filtragem de Ramos Não Contraditórios
-filterNonContradictory :: [[Formula]] -> [[Formula]]
-filterNonContradictory = filter (not . isContradiction)
-
--- Função Principal
+-- Função principal para demonstrar a avaliação de fórmulas lógicas
 main :: IO ()
 main = do
-    -- Defina sua fórmula lógica aqui
-    let formula = Imply (Var "A") (Imply (Var "B") (Var "A"))
-    -- Executa o método de tableaux
-    let result = filterNonContradictory (tableaux [Not formula])
-    -- Verifica e imprime o resultado
-    if null result
-        then putStrLn "Válida"
-        else do
-            putStrLn "Inválida"
-            mapM_ (putStrLn . formatBranch) result
+    let formula1 = Or (Atom True) (And (Atom False) (Or (Atom True) (Atom False)))
+    let formula2 = Not (Or (Atom True) (Not (Atom True)))
+    let formula3 = Imply (Atom True) (Atom False)
+    let formula4 = BiImply (Atom True) (Not (Atom False))
+    let formula5 = BiImply (Atom True) (Imply (Atom False) (Atom True))
 
--- Formatação dos Ramos da Árvore
-formatBranch :: [Formula] -> String
-formatBranch = unwords . map show
+    putStrLn "Exemplo 1:"
+    putStrLn $ "Fórmula: " ++ show formula1
+    putStrLn $ "Avaliação: " ++ show (evaluate formula1)
+    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula1
+    putStrLn ""
+
+    putStrLn "Exemplo 2:"
+    putStrLn $ "Fórmula: " ++ show formula2
+    putStrLn $ "Avaliação: " ++ show (evaluate formula2)
+    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula2
+    putStrLn ""
+
+    putStrLn "Exemplo 3:"
+    putStrLn $ "Fórmula: " ++ show formula3
+    putStrLn $ "Avaliação: " ++ show (evaluate formula3)
+    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula3
+    putStrLn ""
+
+    putStrLn "Exemplo 4:"
+    putStrLn $ "Fórmula: " ++ show formula4
+    putStrLn $ "Avaliação: " ++ show (evaluate formula4)
+    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula4
+    putStrLn ""
+
+    putStrLn "Exemplo 5:"
+    putStrLn $ "Fórmula: " ++ show formula5
+    putStrLn $ "Avaliação: " ++ show (evaluate formula5)
+    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula5
+    putStrLn ""
