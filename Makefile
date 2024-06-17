@@ -1,21 +1,28 @@
-# Makefile para compilar o código Haskell
+# Makefile para compilar e executar o programa Haskell
 
-# Compilador Haskell
-GHC = ghc
+# Comando para compilar o programa Haskell
+ghc_opts = -Wall -O2
 
-# Opções de compilação
-GHC_OPTS = -Wall
+# Nome do executável gerado
+executable = logical_formulas
 
-# Nome do executável
-EXECUTABLE = tableaux
+# Lista de fontes Haskell
+sources = Main.hs
 
-# Arquivo fonte
-SOURCE = tableaux.hs
+# Comando para construir o executável
+build:
+	ghc $(ghc_opts) -o $(executable) $(sources)
 
-# Regra para construir o executável
-$(EXECUTABLE): $(SOURCE)
-    $(GHC) $(GHC_OPTS) -o $(EXECUTABLE) $(SOURCE)
-
-# Regra para limpar arquivos temporários e o executável
+# Comando para limpar arquivos gerados pela compilação
 clean:
-    rm -f $(EXECUTABLE) *.o *.hi
+	rm -f $(executable) *.o *.hi
+
+# Comando para rodar o programa com os exemplos
+run:
+	./$(executable)
+
+# Comando para compilar e rodar o programa
+all: build run
+
+# Regras phony para garantir que não haja conflito com arquivos de mesmo nome
+.PHONY: build clean run all
