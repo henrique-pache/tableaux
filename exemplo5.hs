@@ -8,4 +8,4 @@ main = do
     putStrLn "Exemplo 5:"
     putStrLn $ "Fórmula: " ++ show formula5
     putStrLn $ "Avaliação: " ++ show (evaluate formula5)
-    putStrLn $ "Árvore de Tableaux: " ++ buildTree formula5
+    putStrLn $ "Árvore de Tableaux:\n " ++ buildTree formula5

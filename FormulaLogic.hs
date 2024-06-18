@@ -25,10 +25,31 @@ evaluate (BiImply left right) = (evaluate left == evaluate right)
 
 -- Função para construir uma árvore de tableaux (opcional, apenas para demonstração)
 buildTree :: Formula -> String
-buildTree (Atom True) = "True"
-buildTree (Atom False) = "False"
-buildTree (Not formula) = "¬" ++ buildTree formula
-buildTree (And left right) = "(" ++ buildTree left ++ " ∧ " ++ buildTree right ++ ")"
-buildTree (Or left right) = "(" ++ buildTree left ++ " ∨ " ++ buildTree right ++ ")"
-buildTree (Imply left right) = "(" ++ buildTree left ++ " → " ++ buildTree right ++ ")"
-buildTree (BiImply left right) = "(" ++ buildTree left ++ " ↔ " ++ buildTree right ++ ")"
+buildTree formula = buildTreeIndented formula 0
+
+-- Função auxiliar para construir a árvore com indentação
+buildTreeIndented :: Formula -> Int -> String
+buildTreeIndented (Atom True) _ = "True"
+buildTreeIndented (Atom False) _ = "False"
+buildTreeIndented (Not formula) depth =
+    indent depth ++ "¬" ++ buildTreeIndented formula (depth + 1)
+buildTreeIndented (And left right) depth =
+    indent depth ++ "∧\n" ++
+    indent (depth + 1) ++ buildTreeIndented left (depth + 1) ++ "\n" ++
+    indent (depth + 1) ++ buildTreeIndented right (depth + 1)
+buildTreeIndented (Or left right) depth =
+    indent depth ++ "∨\n" ++
+    indent (depth + 1) ++ buildTreeIndented left (depth + 1) ++ "\n" ++
+    indent (depth + 1) ++ buildTreeIndented right (depth + 1)
+buildTreeIndented (Imply left right) depth =
+    indent depth ++ "→\n" ++
+    indent (depth + 1) ++ buildTreeIndented left (depth + 1) ++ "\n" ++
+    indent (depth + 1) ++ buildTreeIndented right (depth + 1)
+buildTreeIndented (BiImply left right) depth =
+    indent depth ++ "↔\n" ++
+    indent (depth + 1) ++ buildTreeIndented left (depth + 1) ++ "\n" ++
+    indent (depth + 1) ++ buildTreeIndented right (depth + 1)
+
+-- Função para gerar a indentação com base na profundidade
+indent :: Int -> String
+indent depth = replicate (depth * 2) ' '

@@ -62,3 +62,10 @@ main = do
 
 formatBranch :: [Formula] -> String
 formatBranch = unwords . map show
+
+
+
+
+
+ghc --make exemplo1.hs
+runghc exemplo1.hs
