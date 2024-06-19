@@ -3,9 +3,51 @@ import FormulaLogic (evaluate, buildTree, Formula(..))
 
 main :: IO ()
 main = do
-    let formula5 = BiImply (Atom True) (Imply (Atom False) (Atom True))
+    let formula10 = BiImply
+                    (Imply
+                        (Or
+                            (Atom True)
+                            (Not (Atom False))
+                        )
+                        (And
+                            (Not (Atom True))
+                            (Or
+                                (Atom False)
+                                (And
+                                    (Atom True)
+                                    (Not (Atom False))
+                                )
+                            )
+                        )
+                    )
+                    (Or
+                        (Not
+                            (And
+                                (Atom True)
+                                (Not (Atom False))
+                            )
+                        )
+                        (Or
+                            (And
+                                (Atom True)
+                                (Or
+                                    (Atom False)
+                                    (Atom True)
+                                )
+                            )
+                            (Imply
+                                (Atom False)
+                                (Not
+                                    (Or
+                                        (Atom True)
+                                        (Not (Atom False))
+                                    )
+                                )
+                            )
+                        )
+                    )
 
-    putStrLn "Exemplo 5:"
-    putStrLn $ "Fórmula: " ++ show formula5
-    putStrLn $ "Avaliação: " ++ show (evaluate formula5)
-    putStrLn $ "Árvore de Tableaux:\n " ++ buildTree formula5
+    putStrLn "Exemplo 10:"
+    putStrLn $ "Fórmula: " ++ show formula10
+    putStrLn $ "Avaliação: " ++ show (evaluate formula10)
+    putStrLn $ "Árvore de Tableaux:\n " ++ buildTree formula10
